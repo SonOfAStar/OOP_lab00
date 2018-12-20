@@ -7,7 +7,6 @@
 
 class Triangle : public Figure{
 public:
-    char type;
     Triangle();
     Triangle(std::istream &is);
     Triangle(double i,double j,double k);

@@ -7,11 +7,10 @@
 Pentagon::Pentagon() : Pentagon(0, 0, 0, 0, 0, 0, 0, 0, 0, 0) {
 }
 
-TAllocator Pentagon::figure_alloc(sizeof(Pentagon), 10);
+TAllocator Pentagon::figure_alloc(sizeof(Pentagon), 100);
 
 Pentagon::Pentagon(double i_x, double j_x, double k_x, double l_x, double m_x, double i_y, double j_y, double k_y, double l_y, double m_y) :
     a_x(i_x), a_y(i_y), b_x(j_x), b_y(j_y), c_x(k_x), c_y(k_y), d_x(l_x), d_y(l_y), e_x(m_x), e_y(m_y) {
-    type = 'p';
     std::cout << "Pentagon created:  point A: " << a_x << ", " << a_y << std::endl;
     std::cout << "Pentagon created:  point B: " << b_x << ", " << b_y << std::endl;
     std::cout << "Pentagon created:  point C: " << c_x << ", " << c_y << std::endl;
@@ -20,7 +19,6 @@ Pentagon::Pentagon(double i_x, double j_x, double k_x, double l_x, double m_x, d
 }
 
 Pentagon::Pentagon(std::istream &is) {
-    type = 'p';
     is >> a_x >> a_y;
     is >> b_x >> b_y;
     is >> c_x >> c_y;
@@ -75,7 +73,6 @@ void Pentagon::Print() {
 }
 
 Pentagon& Pentagon::operator = (const Pentagon &orig){
-    this->type = orig.type;
     this->a_x = orig.a_x;
     this->a_y = orig.a_y;
     this->b_x = orig.b_x;
@@ -124,7 +121,6 @@ std::ostream& operator<<(std::ostream& os,const Pentagon pentagon){
 
 std::istream& operator>>(std::istream& os, Pentagon &pentagon){
     std::cout << "Reading figure: Pentagon. Coordinates: " << std::endl;
-    pentagon.type = 'p';
     os >> pentagon.a_x;
     os >> pentagon.a_y;
     os >> pentagon.b_x;

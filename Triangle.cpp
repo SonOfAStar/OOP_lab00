@@ -6,20 +6,17 @@ Triangle::Triangle() : Triangle(0, 0, 0) {
 }
 
 Triangle::Triangle(double i, double j, double k) : side_a(i), side_b(j), side_c(k) {
-    type = 't';
     //std::cout << "Triangle created: " << side_a << ", " << side_b << ", " << side_c << std::endl;
 }
 
 Triangle::Triangle(std::istream &is) {
-    type = 't';
     is >> side_a;
     is >> side_b;
     is >> side_c;
 }
 
 Triangle::Triangle(const Triangle& orig) {
-    type = 't';
-    std::cout << "Triangle copy created" << std::endl;
+    //std::cout << "Triangle copy created" << std::endl;
     side_a = orig.side_a;
     side_b = orig.side_b;
     side_c = orig.side_c;

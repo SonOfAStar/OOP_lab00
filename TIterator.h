@@ -2,31 +2,29 @@
 #define TITERATOR_H_INCLUDED
 
 //#include "TContainer.h"
-#include "MyStack.h"
+#include <memory>
 
 template <class T>
 class TIterator
 {
 public:
 
-    TIterator(MyStack<T>* n, int p)   {
+    TIterator(std::shared_ptr<T>* n, int p)   {
 
         my_Body = n;
         pos = p;
     }
 
-
-
-    MyStack<T>* operator * (){
-        return &(my_Body[pos]);
+    std::shared_ptr<T> operator * (){
+        return my_Body[pos];
     }
 
-    MyStack<T>* operator -> (){
+    std::shared_ptr<T> operator -> (){
         return my_Body[pos];
     }
 
     void operator ++ (){
-        ++pos;
+        pos += 1;
     }
 
     TIterator operator ++ (int){
@@ -45,9 +43,8 @@ public:
 
 private:
 
-    MyStack<T>*  my_Body;
+    std::shared_ptr<T>*  my_Body;
     int pos;
-    //int st_pos;
 };
 
 

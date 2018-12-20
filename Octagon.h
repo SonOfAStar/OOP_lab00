@@ -8,7 +8,6 @@
 
 class Octagon : public Figure{
     public:
-        char type;
         Octagon();
         Octagon(std::istream &is);
         Octagon(double i_x, double j_x, double k_x, double l_x, double m_x, double n_x, double o_x, double p_x, double i_y, double j_y, double k_y, double l_y, double m_y, double n_y, double o_y, double p_y);

@@ -4,11 +4,10 @@
 
 Octagon::Octagon() : Octagon(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0){
 }
-TAllocator Octagon::figure_alloc(sizeof(Octagon), 5);
+TAllocator Octagon::figure_alloc(sizeof(Octagon), 100);
 
 Octagon::Octagon(double i_x, double j_x, double k_x, double l_x, double m_x, double n_x, double o_x, double p_x, double i_y, double j_y, double k_y, double l_y, double m_y, double n_y, double o_y, double p_y) :
     a_x(i_x), a_y(i_y), b_x(j_x), b_y(j_y), c_x(k_x), c_y(k_y), d_x(l_x), d_y(l_y), e_x(m_x), e_y(m_y), f_x(n_x), f_y(n_y), g_x(o_x), g_y(o_y), h_x(p_x), h_y(p_y) {
-    type = 'o';
     std::cout << "Octagon created:  point A: " << a_x << ", " << a_y << std::endl;
     std::cout << "Octagon created:  point B: " << b_x << ", " << b_y << std::endl;
     std::cout << "Octagon created:  point C: " << c_x << ", " << c_y << std::endl;
@@ -20,7 +19,6 @@ Octagon::Octagon(double i_x, double j_x, double k_x, double l_x, double m_x, dou
 }
 
 Octagon::Octagon(std::istream &is) {
-    type = 'o';
     is >> a_x >> a_y;
     is >> b_x >> b_y;
     is >> c_x >> c_y;
@@ -32,7 +30,7 @@ Octagon::Octagon(std::istream &is) {
 }
 
 Octagon::~Octagon(){
-    std::cout << "Octagon deleted" << std::endl;
+    //std::cout << "Octagon deleted" << std::endl;
 }
 
 double Octagon::Square() {
@@ -102,7 +100,6 @@ void Octagon::Print(){
 }
 
 Octagon& Octagon::operator=(const Octagon& orig){
-    this->type = orig.type;
     this->a_x = orig.a_x;
     this->a_y = orig.a_y;
     this->b_x = orig.b_x;
@@ -145,7 +142,6 @@ std::ostream& operator<<(std::ostream& os,const Octagon octagon){
 
 std::istream& operator>>(std::istream& os, Octagon &octagon){
     std::cout << "Reading figure: Octagon. Coordinates: " << std::endl;
-    octagon.type = 'o';
     os >> octagon.a_x;
     os >> octagon.a_y;
     os >> octagon.b_x;

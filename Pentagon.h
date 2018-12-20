@@ -7,7 +7,6 @@
 
 class Pentagon : public Figure{
 public:
-    char type;
     Pentagon();
     Pentagon(std::istream &is);
     Pentagon(double i_x, double j_x, double k_x, double l_x, double m_x, double i_y, double j_y, double k_y, double l_y, double m_y);

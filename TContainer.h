@@ -3,15 +3,18 @@
 
 #include <memory>
 #include <iostream>
+#include <exception>
+#include <cstdlib>
+#include <future>
+//#include <thread>
 #include "TIterator.h"
-#include "MyStack.h"
-#include "TFigure.h"
 
+template <class T>
 class TContainer
 {
 
     private:
-        MyStack <std::shared_ptr<Figure>>*  massive_Body;
+        std::shared_ptr<T>*  massive_Body;
         unsigned int massive_Size;
         unsigned int massive_Capacity ;
 
@@ -19,28 +22,33 @@ class TContainer
         TContainer(){
             this->massive_Capacity = 10;
             this->massive_Size = 0;
-            this->massive_Body = new MyStack <std::shared_ptr<Figure>>[10];
+            this->massive_Body = new std::shared_ptr<T>[10];
         }
 
-        bool Push_back (std::shared_ptr<Figure> data){
-            if (this->massive_Size == this->massive_Capacity){
-                massive_Capacity *= 1.5;
-                //std::cout << "?";
-                MyStack<std::shared_ptr<Figure>>* newbody = new MyStack<std::shared_ptr<Figure>>[massive_Capacity];
-                if (!newbody){
-                    return false;
-                }
-                for(int i = 0; i < massive_Size; i++){
-                    newbody[i] = massive_Body[i];
-                }
+        TContainer(int t){
+            this->massive_Capacity = t;
+            this->massive_Size = t;
+            this->massive_Body = new std::shared_ptr<T>[t];
+        }
 
-                delete massive_Body;
-                massive_Body = newbody;
+        bool Push_back (std::shared_ptr<T> &data){
+            if (this->massive_Size == this->massive_Capacity){
+                this->massive_Capacity = this->massive_Capacity * 1.5;
+                std::shared_ptr<T> new_body [this->massive_Capacity];
+                for (int i = 0; i < this->massive_Size; i++){
+                    new_body[i] = this->massive_Body[i];
+                    //free(this->massive_Body[i]);
+                }
+                this->massive_Body = new_body;
             }
-            //std::cout << "|" << std::endl;
-            //massive_Body[massive_Size] = new MyStack<std::shared_ptr <Figure> >();
-            massive_Body[massive_Size].Push(data);
-            ++massive_Size;
+            if (this->massive_Body == nullptr){
+                free(this->massive_Body);
+                this->massive_Capacity = 0;
+                this->massive_Size = 0;
+                return false;
+            }
+            this->massive_Body[this->massive_Size] = data;
+            ++this->massive_Size;
             return true;
         }
 
@@ -48,35 +56,13 @@ class TContainer
             return this->Size() == 0;
         }
 
-        void del(char t){
-            for (int i = 0; i < massive_Size; i++){
-                std::cout << "Checking " << i << "th stack.\n";
-                massive_Body[i].del(t);
-                std::cout << "Checking " << i << "th stack is finished.\n";
-                if (massive_Body[i].size() == 0){
-                    for (int j = i+1; j < massive_Size; j++){
-                        massive_Body[j-1] = massive_Body[j];
-                    }
-                    --this->massive_Size;
-                }
-            }
-        }
-
-        void del(double sq){
-            for (int i = 0; i < massive_Size; i++){
-                std::cout << "Checking " << i << "th stack.\n";
-                massive_Body[i].del(sq);
-                if (massive_Body[i].size() == 0){
-                    for (int j = i+1; j < massive_Size; j++){
-                        massive_Body[j-1] = massive_Body[j];
-                    }
-                    --this->massive_Size;
-                }
-            }
-        }
-
-        std::shared_ptr<Figure> Pop_back(){
-            return massive_Body[massive_Size - 1].Pop();
+        std::shared_ptr<T> Pop_back(){
+            std::shared_ptr<T> backtrack = this->massive_Body[this->massive_Size-1];
+            this->massive_Body[this->massive_Size-1] = nullptr;
+            this->massive_Size -= 1;
+            //this->massive_Body = (std::shared_ptr<T>)realloc(this->massive_Body, this->massive_Size * sizeof(std::shared_ptr<T>));
+            //this->massive_Capacity = this->massive_Size;
+            return backtrack;
         }
 
 
@@ -84,69 +70,125 @@ class TContainer
             return this->massive_Size;
         }
 
-        bool Set(int pos, std::shared_ptr<Figure> &data){
-            if(this->massive_Body[pos].size() < 5) {
-                    std::cout << "Pushing at " << pos << ".\n";
-                    massive_Body[pos].Push(data);
-
+        bool Set(int pos, std::shared_ptr<T> data){
+            if(pos >= this->massive_Size){
+                return false;
             }
-            else {
-                std::cout << "The stack you requested is already full!\n Type c to continue with adding anyway, type anything else to stop." << std::endl;
-                char c;
-                std::cin >> c;
-                if (c != 'c'){
-                    return true;
-                }
-                else{
-                    int cp = pos;
-                    while (cp < massive_Size){
-                        if(this->massive_Body[cp].size() < 5) {
-                            massive_Body[cp].Push(data);
-                            return true;
-                        }
-                        ++cp;
-                    }
-                    std::cout << "The massive is full, pushing a new element." << std::endl;
-                    this->Push_back(data);
-                }
-            }
+            this->massive_Body[pos-1] = data;;
             return true;
         }
 
-        MyStack <std::shared_ptr<Figure>>* Get(int pos)const {
-            return &(this->massive_Body[pos]);
+        std::shared_ptr<T> Get(int pos)const {
+            return (this->massive_Body[pos]);
         }
 
-        friend std::ostream& operator << (std::ostream& os,const TContainer* massive){
-            std::cout << "Printing massive." << std::endl;
+        //std::future<void> sort_in_background();
 
+        std::future<void> sort_in_background() {
+            std::packaged_task<void(void) > task(std::bind(std::mem_fn(&TContainer<T>::t_sorte), this));
+            std::future<void> res(task.get_future());
+            std::thread th(std::move(task));
+            th.detach();
+            return res;
+        }
+
+
+        void t_sorte(){
+            if(massive_Size > 1){
+            std::cout << "Sorting with merge_paral, size = " << massive_Size << '\n';
+            TContainer* left = new TContainer<Figure>(), *right = new TContainer<Figure>();
+            std::shared_ptr<Figure> mid = massive_Body[massive_Size/2];
+            for (int i = 0; i < massive_Size; i++){
+                    if (i != massive_Size/2){
+                        if (massive_Body[i]->Square() > mid->Square()){
+                            right->Push_back(massive_Body[i]);
+                        }
+                        else left->Push_back(massive_Body[i]);
+                    }
+            }
+            std::cout << "filled\n";
+
+            std::future<void> left_res = left->sort_in_background();
+            std::future<void> right_res = right->sort_in_background();
+
+            left_res.get();
+            int i;
+            for(i = 0; i < left->Size(); i++){
+                massive_Body[i] = left->Get(i);
+            }
+            massive_Body[i] = mid;
+            i++;
+
+            right_res.get();
+            for (int j = 0; j < right->Size(); i++){
+                massive_Body[i+j] = right->Get(j);
+            }
+            std::cout << "copied\n";
+            delete(left);
+            delete(right);
+            }
+        return;
+        }
+
+        void sorte(){
+            if (massive_Size > 1){
+                std::cout << "Sorting with merge_non_paral, size = " << massive_Size << '\n';
+                TContainer* left = new TContainer<Figure>(), *right = new TContainer<Figure>();
+                std::shared_ptr<Figure> mid = massive_Body[massive_Size/2];
+
+                for (int i = 0; i < massive_Size; i++){
+                    if (i != massive_Size/2){
+                        if (massive_Body[i]->Square() > mid->Square()){
+                            right->Push_back(massive_Body[i]);
+                        }
+                        else left->Push_back(massive_Body[i]);
+                    }
+                }
+                std::cout << "filled\n";
+                left->sorte();
+                right->sorte();
+
+                int i;
+                for(i = 0; i < left->Size(); i++){
+                    massive_Body[i] = left->Get(i);
+                }
+                massive_Body[i] = mid;
+                i++;
+                for (int j = 0; j < right->Size(); i++){
+                    massive_Body[i+j] = right->Get(j);
+                }
+                std::cout << "copied\n";
+                delete(left);
+                delete(right);
+                return;
+            }
+        }
+
+        friend std::ostream& operator << (std::ostream& os,const TContainer<T>* massive){
             for (int i = 0; i < massive->Size(); i++){
-                std::cout << i << "th stack is:\n";
-                MyStack <std::shared_ptr<Figure>>* p = massive->Get(i);
+                std::cout << i << "th element is:\n";
+                std::shared_ptr<T> p = massive->Get(i);
                 p->Print();
                 std::cout << "\n\n";
             }
             return os;
         }
 
-        TIterator <std::shared_ptr<Figure>> begin(){
-            return TIterator<std::shared_ptr<Figure>>(massive_Body,0);
+        TIterator <T> begin(){
+            return TIterator<T>(massive_Body,0);
         }
-        TIterator <std::shared_ptr<Figure>> end(){
+        TIterator <T> end(){
             if (this->Size() > 0){
-                return TIterator<std::shared_ptr<Figure>>(massive_Body,this->Size());
+                return TIterator<T>(massive_Body,this->Size());
             }
-            return TIterator <std::shared_ptr<Figure>>(nullptr, 0);
+            return TIterator<T>(nullptr, 0);
 
         }
 
         ~TContainer(){
             for (int i = 0; i < this->Size(); i++){
-                while (massive_Body[i].size() > 0){
-                    massive_Body[i].Pop();
-                }
+                this->massive_Body[i] = nullptr;
             }
-            delete this->massive_Body;
         }
 };
 

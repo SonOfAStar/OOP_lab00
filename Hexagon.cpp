@@ -5,11 +5,10 @@
 Hexagon::Hexagon() : Hexagon(0,0,0,0,0,0,0,0,0,0,0,0){
 }
 
-TAllocator Hexagon::figure_alloc(sizeof(Hexagon), 5);
+//TAllocator* Hexagon::figure_alloc(sizeof(Hexagon), 100);
 
 Hexagon::Hexagon(double i_x, double j_x, double k_x, double l_x, double m_x, double n_x, double i_y, double j_y, double k_y, double l_y, double m_y, double n_y) :
     a_x(i_x), a_y(i_y), b_x(j_x), b_y(j_y), c_x(k_x), c_y(k_y), d_x(l_x), d_y(l_y), e_x(m_x), e_y(m_y), f_x(n_x), f_y(n_y) {
-    type = 'h';
     std::cout << "Hexagon created:  point A: " << a_x << ", " << a_y << std::endl;
     std::cout << "Hexagon created:  point B: " << b_x << ", " << b_y << std::endl;
     std::cout << "Hexagon created:  point C: " << c_x << ", " << c_y << std::endl;
@@ -19,7 +18,6 @@ Hexagon::Hexagon(double i_x, double j_x, double k_x, double l_x, double m_x, dou
 }
 
 Hexagon::Hexagon(std::istream &is) {
-    type = 'h';
     is >> a_x >> a_y;
     is >> b_x >> b_y;
     is >> c_x >> c_y;
@@ -48,15 +46,11 @@ double Hexagon::Square() {
     double res = 0;
 
     Triangle *T = new Triangle(ab, ac, bc);
-    std::cout << "1";
     res += T->Square();
     T->Set(ac, cf, af);
-    std::cout << "2";
     res += T->Square();
     T->Set(cd, df, cf);
-    std::cout << "3";
     res += T->Square();
-    std::cout << "4";
     T->Set(ef, de, df);
     res += T->Square();
     delete T;
@@ -64,7 +58,6 @@ double Hexagon::Square() {
 }
 
 Hexagon::Hexagon(const Hexagon& orig){
-    this->type = orig.type;
     std::cout << "Hexagon copy created" << std::endl;
     a_x = orig.a_x;
     a_y = orig.a_y;
@@ -118,7 +111,6 @@ std::ostream& operator<<(std::ostream& os,const Hexagon hexagon){
 
 std::istream& operator>>(std::istream& os, Hexagon &hexagon){
     std::cout << "Reading figure: Hexagon. Coordinates: " << std::endl;
-    hexagon.type = 'h';
     os >> hexagon.a_x;
     os >> hexagon.a_y;
     os >> hexagon.b_x;

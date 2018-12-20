@@ -3,7 +3,6 @@
 
 class Figure {
 public:
-    char type = 'f';
     virtual double Square() = 0;
     virtual void   Print() = 0;
     virtual ~Figure() {};
